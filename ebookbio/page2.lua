@@ -95,8 +95,6 @@ function scene:create(event)
     local spacing = 80
 
 
-    local sceneGroup = display.newGroup()
-
     for i, data in ipairs(buttonData) do
         local button = widget.newButton({
             label = data.label,
