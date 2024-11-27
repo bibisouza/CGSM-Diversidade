@@ -18,8 +18,17 @@ local function createFallingBoxes()
         {0.2, 0.6, 1},
     }
 
+    local startY = 100
+    local delay = 500
+
+    local ground = display.newRect(display.contentCenterX, display.contentHeight - 150, display.contentWidth, 10)
+    ground:setFillColor(0, 0, 0, 0)
+    physics.addBody(ground, "static", { bounce = 0.2 })
+    scene.view:insert(ground)
+
     for i = 1, #boxData do
-        local box = display.newRoundedRect(display.contentCenterX, 100 + (i * 100), 200, 50, 12)
+        timer.performWithDelay(delay * i, function()
+        local box = display.newRoundedRect(display.contentCenterX, startY, 200, 50, 12)
         box:setFillColor(unpack(colors[i]))
         box.strokeWidth = 2
         box:setStrokeColor(0)
@@ -29,18 +38,28 @@ local function createFallingBoxes()
             x = box.x,
             y = box.y,
             font = "Montserrat-VariableFont_wght.ttf-Bold",
-            fontSize = 20,
+            fontSize = 25,
         })
         boxText:setFillColor(1)
 
+        local boxGroup = display.newGroup()
+        boxGroup:insert(box)
+        boxGroup:insert(boxText)
+
+        box.enterFrame = function()
+            boxText.x = box.x
+            boxText.y = box.y
+        end
+        Runtime:addEventListener("enterFrame", box)
+        
         -- Ativar
         physics.addBody(box, "dynamic", { density = 1, friction = 0.5, bounce = 0.2})
         box.angularDamping = 3
 
         -- Add ao grupo da cena
-        scene.view:insert(box)
-        scene.view:insert(boxText)
-    end
+        scene.view:insert(boxGroup)
+    end)
+end
 end
 
 -- Som 
