@@ -2,53 +2,57 @@ local composer = require("composer")
 local widget = require("widget")
 local scene = composer.newScene()
 
--- Variável global para estado do som
+-- Som 
 local isSoundOn = true
 
--- Função para alternar o estado do som
+
 local function toggleSound()
     isSoundOn = not isSoundOn
     print("Som:", isSoundOn and "Ligado" or "Desligado")
 end
 
--- Função para avançar para a próxima página
+-- Próxima página
 local function goToNextPage()
-    composer.gotoScene("page3") -- Crie a próxima página separadamente
+    composer.gotoScene("page3")
 end
 
--- Função para voltar à página anterior
+-- Página anterior
 local function goToPreviousPage()
-    composer.gotoScene("page1") -- Retorna à página anterior
+    composer.gotoScene("page1")
 end
 
-
-
--- Função para exibir imagem correspondente ao botão
+-- Exibir imagem
 local function showImage(imagePath)
     local imageGroup = display.newGroup()
 
-    -- Exibir imagem em tela cheia
-    local fullScreenImage = display.newImageRect(imageGroup, imagePath, display.contentWidth, display.contentHeight)
-    fullScreenImage.x = display.contentCenterX
-    fullScreenImage.y = display.contentCenterY
+    local background = display.newRect(imageGroup, display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight)
+    background:setFillColor(0, 0, 0, 0.5)
 
-    -- Função para remover a imagem ao clicar
-    local function removeImage()
-        display.remove(imageGroup)
-        imageGroup = nil
+    background:addEventListener("tap", function()
+        if imageGroup then
+            display.remove(imageGroup)
+            imageGroup = nil
+        end
+    end)
+
+    -- Exibir a imagem correspondente
+    local bannerImage = display.newImageRect(imageGroup, imagePath, system.ResourceDirectory, 600, 300)
+    if not bannerImage then
+        print("Erro: Imagem não carregada. Verifique o caminho:", imagePath)
+        return
     end
 
-    -- Adicionar evento de toque para fechar a imagem
-    fullScreenImage:addEventListener("tap", removeImage)
+    bannerImage.x = display.contentCenterX
+    bannerImage.y = display.contentCenterY
 end
 
 -- Cena
 function scene:create(event)
     local sceneGroup = self.view
 
-    -- Fundo da página
+    -- Fundo
     local background = display.newRect(sceneGroup, display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight)
-    background:setFillColor(0.05, 0.2, 0.05) -- Fundo verde escuro
+    background:setFillColor(0.05, 0.2, 0.05) 
 
     -- Título
     local title = display.newText({
@@ -75,32 +79,44 @@ function scene:create(event)
     })
     instruction:setFillColor(1)
 
-    -- Função para criar botões
-    local function createButton(x, y, label, imagePath)
+    -- Dados dos botões
+    local buttonData = {
+        { label = "Domínio", color = {0.1, 0.6, 0.9}, image = "ebookbio\Images.xcassets\ImgPag2\dominio.png" },
+        { label = "Reino", color = {1, 0.6, 0.2}, image = "ebookbio\Images.xcassets\ImgPag2\reino.png" },
+        { label = "Filo", color = {0.3, 0.7, 0.3}, image = "ebookbio\Images.xcassets\ImgPag2\filo.png" },
+        { label = "Classe", color = {0.1, 0.6, 0.9}, image = "ebookbio\Images.xcassets\ImgPag2\classe.png" },
+        { label = "Ordem", color = {1, 0.6, 0.2}, image = "ebookbio\Images.xcassets\ImgPag2\ordem.png" },
+        { label = "Família", color = {0.3, 0.7, 0.3}, image = "ebookbio\Images.xcassets\ImgPag2\familia.png" },
+        { label = "Gênero", color = {0.1, 0.6, 0.9}, image = "ebookbio\Images.xcassets\ImgPag2\genero.png" },
+        { label = "Espécie", color = {1, 0.6, 0.2}, image = "ebookbio\Images.xcassets\ImgPag2\especie.png" },
+    }
+
+    -- Criar botões dinamicamente
+    local startX = display.contentCenterX - 120
+    local startY = 500
+    local spacing = 80
+
+    for i, data in ipairs(buttonData) do
         local button = widget.newButton({
-            label = label,
-            font = "Montserrat-VariableFont_wght.ttf",
-            fontSize = 18,
+            label = data.label,
+            font = "Montserrat-VariableFont_wght.ttf-Bold",
+            fontSize = 25,
             shape = "roundedRect",
             width = 200,
-            height = 60,
-            fillColor = { default = {0.1, 0.6, 0.9}, over = {0.2, 0.7, 1} },
-            labelColor = { default = {1}, over = {0} },
+            height = 50,
+            fillColor = { default = data.color, over = {0.8, 0.8, 0.8} },
+            labelColor = { default = {0}, over = {1} },
             onRelease = function()
-                showImage(imagePath)
+                showImage(data.image)
             end
         })
-        button.x = x
-        button.y = y
+        button.x = startX + ((i - 1) % 2) * 240
+        button.y = startY + math.floor((i - 1) / 2) * spacing
         sceneGroup:insert(button)
     end
 
-    -- Criar botões
-    createButton(display.contentCenterX, 400, "Domínio", "Images.xcassets/ImgPag2/dominio_banner.png")
-    createButton(display.contentCenterX, 500, "Reino", "Images.xcassets/ImgPag2/reino_banner.png")
-    createButton(display.contentCenterX, 600, "Filo", "Images.xcassets/ImgPag2/filo_banner.png")
 
-    -- Botão toggle de som
+    -- Botão som
     local soundToggle = widget.newButton({
         label = "Som on/off",
         font = "Montserrat-VariableFont_wght.ttf",
