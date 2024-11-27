@@ -112,18 +112,6 @@ function scene:create(event)
     })
     explanation:setFillColor(1)
 
-    -- Botão Empilhar
-    local stackButton = widget.newButton({
-        label = "",
-        shape = "circle",
-        radius = 40,
-        fillColor = { default = {1, 0.6, 0}, over = {1, 0.5, 0} },
-    --    onRelease = stackBoxes
-    })
-    stackButton.x = display.contentWidth - 100
-    stackButton.y = display.contentCenterY
-    sceneGroup:insert(stackButton)
-
  -- Botão som
  local soundToggle = widget.newButton({
     label = "Som on/off",
