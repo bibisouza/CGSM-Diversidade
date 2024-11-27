@@ -55,17 +55,17 @@ function scene:create(event)
     sceneGroup:insert(description)
 
     -- Espaços para imagens
-    local image1 = display.newImageRect(sceneGroup, "Images.xcassets/ImgPag1/deserto.png", 240, 240)
+    local image1 = display.newImageRect(sceneGroup, "Images/ImgPag1/deserto.png", 240, 240)
     image1.x = display.contentWidth * 0.2
     image1.y = 560
     image1.name = "Deserto"
 
-    local image2 = display.newImageRect(sceneGroup, "Images.xcassets/ImgPag1/pradaria.png", 240, 240)
+    local image2 = display.newImageRect(sceneGroup, "Images/ImgPag1/pradaria.png", 240, 240)
     image2.x = display.contentWidth * 0.8
     image2.y = 560
     image2.name = "Pradaria"
 
-    local image3 = display.newImageRect(sceneGroup, "Images.xcassets/ImgPag1/floresta.png", 240, 240)
+    local image3 = display.newImageRect(sceneGroup, "Images/ImgPag1/floresta.png", 240, 240)
     image3.x = display.contentWidth * 0.5
     image3.y = 820
     image3.name = "Floresta"

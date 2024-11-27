@@ -29,20 +29,18 @@ local function showImage(imagePath)
     background:setFillColor(0, 0, 0, 0.5)
 
     background:addEventListener("tap", function()
-        if imageGroup then
             display.remove(imageGroup)
             imageGroup = nil
-        end
     end)
 
     -- Exibir a imagem correspondente
-    local bannerImage = display.newImageRect(imageGroup, imagePath, system.ResourceDirectory, 600, 300)
+    local bannerImage = display.newImageRect(imageGroup, imagePath, 600, 300)
     if not bannerImage then
         print("Erro: Imagem não carregada. Verifique o caminho:", imagePath)
         return
     end
 
-    bannerImage.x = display.contentCenterX
+    bannerImage.x = display.contentCenterX 
     bannerImage.y = display.contentCenterY
 end
 
@@ -69,7 +67,7 @@ function scene:create(event)
     -- Explicação
     local instruction = display.newText({
         parent = sceneGroup,
-        text = "A identificação e a classificação dos seres vivos exigem regras, normas e um método particular de trabalho. Desde Aristóteles até Lineu, vários sistemas de classificação foram propostos.\n\nToque em cada botão abaixo para visualizar exemplos.",
+        text = "A identificação e a classificação dos seres vivos exigem regras, normas e um método particular de trabalho. Desde Aristóteles até Lineu, vários sistemas de classificação foram propostos./n/nToque em cada botão abaixo para visualizar exemplos.",
         x = display.contentCenterX,
         y = 300,
         width = display.contentWidth - 40,
@@ -81,20 +79,23 @@ function scene:create(event)
 
     -- Dados dos botões
     local buttonData = {
-        { label = "Domínio", color = {0.1, 0.6, 0.9}, image = "ebookbio\Images.xcassets\ImgPag2\dominio.png" },
-        { label = "Reino", color = {1, 0.6, 0.2}, image = "ebookbio\Images.xcassets\ImgPag2\reino.png" },
-        { label = "Filo", color = {0.3, 0.7, 0.3}, image = "ebookbio\Images.xcassets\ImgPag2\filo.png" },
-        { label = "Classe", color = {0.1, 0.6, 0.9}, image = "ebookbio\Images.xcassets\ImgPag2\classe.png" },
-        { label = "Ordem", color = {1, 0.6, 0.2}, image = "ebookbio\Images.xcassets\ImgPag2\ordem.png" },
-        { label = "Família", color = {0.3, 0.7, 0.3}, image = "ebookbio\Images.xcassets\ImgPag2\familia.png" },
-        { label = "Gênero", color = {0.1, 0.6, 0.9}, image = "ebookbio\Images.xcassets\ImgPag2\genero.png" },
-        { label = "Espécie", color = {1, 0.6, 0.2}, image = "ebookbio\Images.xcassets\ImgPag2\especie.png" },
+        { label = "Domínio", color = {0.1, 0.6, 0.9}, image = "dominio.png" },
+        { label = "Reino", color = {1, 0.6, 0.2}, image = "reino.png" },
+        { label = "Filo", color = {0.3, 0.7, 0.3}, image = "filo.png" },
+        { label = "Classe", color = {0.1, 0.6, 0.9}, image = "classe.png" },
+        { label = "Ordem", color = {1, 0.6, 0.2}, image = "ordem.png" },
+        { label = "Família", color = {0.3, 0.7, 0.3}, image = "familia.png" },
+        { label = "Gênero", color = {0.1, 0.6, 0.9}, image = "genero.png" },
+        { label = "Espécie", color = {1, 0.6, 0.2}, image = "especie.png" },
     }
 
     -- Criar botões dinamicamente
     local startX = display.contentCenterX - 120
     local startY = 500
     local spacing = 80
+
+
+    local sceneGroup = display.newGroup()
 
     for i, data in ipairs(buttonData) do
         local button = widget.newButton({
@@ -107,6 +108,7 @@ function scene:create(event)
             fillColor = { default = data.color, over = {0.8, 0.8, 0.8} },
             labelColor = { default = {0}, over = {1} },
             onRelease = function()
+                print("Tentando carregar a imagem: ", data.image)
                 showImage(data.image)
             end
         })

@@ -30,11 +30,11 @@ function scene:create(event)
     background:setFillColor(0.07, 0.2, 0.07)
 
     -- Img folhas
-    local leaf1 = display.newImageRect(sceneGroup, "Images.xcassets/ImgCapa/leaf1.png", display.contentWidth, display.contentCenterX)
+    local leaf1 = display.newImageRect(sceneGroup, "Images/ImgCapa/leaf1.png", display.contentWidth, display.contentCenterX)
     leaf1.x, leaf1.y = 385, 150
     
 
-    local leaf2 = display.newImageRect(sceneGroup, "Images.xcassets/ImgCapa/leaf2.png", display.contentWidth, display.contentCenterX)
+    local leaf2 = display.newImageRect(sceneGroup, "Images/ImgCapa/leaf2.png", display.contentWidth, display.contentCenterX)
     leaf2.x, leaf2.y = 385, 830
 
     -- Título

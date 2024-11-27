@@ -29,7 +29,7 @@ settings =
 	--
 	iphone =
 	{
-		xcassets = "Images.xcassets",
+		xcassets = "Images",
 		plist =
 		{
 			UIStatusBarHidden = false,
@@ -56,7 +56,7 @@ settings =
 	excludeFiles =
 	{
 		-- Exclude unnecessary files for each platform
-		all = { "Icon.png", "Icon-*dpi.png", "Images.xcassets", },
+		all = { "Icon.png", "Icon-*dpi.png" },
 		android = { "LaunchScreen.storyboardc", },
 	},
 }
