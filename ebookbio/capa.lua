@@ -2,30 +2,29 @@ local composer = require("composer")
 local widget = require("widget")
 local scene = composer.newScene()
 
--- Variável global para estado do som
+-- Som
 local isSoundOn = true
 
--- Função para alternar o estado do som
 local function toggleSound()
     isSoundOn = not isSoundOn
     print("Som:", isSoundOn and "Ligado" or "Desligado")
 end
 
--- Função para avançar para a próxima página
+-- Próxima página
 local function goToNextPage()
-    composer.gotoScene("page1") -- Crie a página 2 separadamente
+    composer.gotoScene("page1")
 end
 
--- Função para abrir a tela de instruções
+-- Instruções
 local function showInstructions()
-    composer.gotoScene("instructions") -- Crie a cena "instructions" separadamente
+    composer.gotoScene("instructions")
 end
 
--- Criação da cena
+-- Cena
 function scene:create(event)
     local sceneGroup = self.view
 
-    -- Fundo Cor
+    -- Fundo
     local background = display.newRect(sceneGroup, display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight)
     background:setFillColor(0.07, 0.2, 0.07)
 
@@ -61,7 +60,7 @@ function scene:create(event)
     subtitle:setFillColor(1)
     sceneGroup:insert(subtitle)
 
-    -- Fundo Autoria (0.07, 0.2, 0.07)
+    -- Fundo Autoria
     local authorBackground = display.newRect(sceneGroup, display.contentCenterX, display.contentHeight - 150, display.contentWidth * 0.5, 105)
     authorBackground:setFillColor(0.07, 0.2, 0.07)
     sceneGroup:insert(authorBackground)

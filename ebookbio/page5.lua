@@ -66,7 +66,7 @@ local function toggleFlashlight(sceneGroup)
     local flashlightText
 
     -- Imagem lanterna /normal
-    local flashlight = display.newImageRect(sceneGroup, "Images/ImgPag5/lanterna.png", 150, 150)
+    local flashlight = display.newImageRect(sceneGroup, "Images/ImgPag5/lanternadesl.png", 150, 150)
     flashlight.x = 650
     flashlight.y = 300
 
@@ -79,13 +79,13 @@ local function toggleFlashlight(sceneGroup)
 
             flashlightText = display.newText({
                 parent = sceneGroup,
-                text = "Conteúdo",
+                text = "Os vírus não são considerados seres vivos porque não possuem células, que são a base de toda forma de vida, e não realizam funções vitais de forma independente, como metabolismo e reprodução.\nPara se replicar, dependem completamente de uma célula hospedeira, o que os coloca fora dos critérios para serem classificados como organismos vivos.",
                 x = display.contentCenterX,
-                y = flashlight.y + 120,
+                y = 500,
                 width = display.contentWidth - 60,
                 font = "Montserrat-VariableFont_wght.ttf",
-                fontSize = 18,
-                align = "center"
+                fontSize = 20,
+                align = "justify"
             })
         else
             flashlight.fill = { type = "image", filename = "Images/ImgPag5/lanternadesl.png" }
