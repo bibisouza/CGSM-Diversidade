@@ -99,14 +99,14 @@ function scene:create(event)
 
     -- Dados dos botões
     local buttonData = {
-        { label = "Domínio", color = {0.1, 0.6, 0.9}, image = "" },
-        { label = "Reino", color = {1, 0.6, 0.2}, image = "" },
-        { label = "Filo", color = {0.3, 0.7, 0.3}, image = "" },
-        { label = "Classe", color = {0.1, 0.6, 0.9}, image = "" },
-        { label = "Ordem", color = {1, 0.6, 0.2}, image = "" },
-        { label = "Família", color = {0.3, 0.7, 0.3}, image = "" },
-        { label = "Gênero", color = {0.1, 0.6, 0.9}, image = "" },
-        { label = "Espécie", color = {1, 0.6, 0.2}, image = "" },
+        { label = "Domínio", color = {0.1, 0.6, 0.9}, image = "Images/Imggg/dominio.png" },
+        { label = "Reino", color = {1, 0.6, 0.2}, image = "Images/Imggg/reino.png" },
+        { label = "Filo", color = {0.3, 0.7, 0.3}, image = "Images/Imggg/filo.png" },
+        { label = "Classe", color = {0.1, 0.6, 0.9}, image = "Images/Imggg/classe.png" },
+        { label = "Ordem", color = {1, 0.6, 0.2}, image = "Images/Imggg/ordem.png" },
+        { label = "Família", color = {0.3, 0.7, 0.3}, image = "Images/Imggg/familia.png" },
+        { label = "Gênero", color = {0.1, 0.6, 0.9}, image = "Images/Imggg/genero.png" },
+        { label = "Espécie", color = {1, 0.6, 0.2}, image = "Images/Imggg/especie.png" },
     }
 
     -- Criar botões dinamicamente
