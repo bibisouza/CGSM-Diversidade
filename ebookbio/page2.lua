@@ -26,36 +26,42 @@ local function showImage(sceneGroup, imagePath)
     local imageGroup = display.newGroup()
     sceneGroup:insert(imageGroup)
 
+
     local background = display.newRect(imageGroup, display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight)
     background:setFillColor(0, 0, 0, 0.5)
+
 
     background:addEventListener("tap", function()
             display.remove(imageGroup)
             imageGroup = nil
     end)
 
-    -- Carregar a imagem
-    local success, bannerImage = pcall(function()
-        return display.newImageRect(imageGroup, imagePath, 600, 300)
-    end)
-
-    if not success or not bannerImage then
-        print("Erro: Imagem não carregada. Verifique o caminho:", imagePath)
-        local errorMessage = display.newText({
-            parent = imageGroup,
-            text = "Erro ao carregar a imagem: " .. imagePath,
-            x = display.contentCenterX,
-            y = display.contentCenterY,
-            width = display.contentWidth - 40,
-            font = native.systemFont,
-            fontSize = 20,
-            align = "center"
-        })
-        errorMessage:setFillColor(1, 0, 0)
+    -- Tentar carregar e exibir a imagem
+    local image = display.newImageRect(imageGroup, imagePath, system.ResourceDirectory, 600, 300) -- Ajuste o tamanho conforme necessário
+    if image then
+        image.x = display.contentCenterX
+        image.y = display.contentCenterY
     else
-        bannerImage.x = display.contentCenterX
-        bannerImage.y = display.contentCenterY
+        print("Erro: Não foi possível carregar a imagem:", imagePath)
     end
+
+    -- Botão "Fechar"
+    local closeButton = widget.newButton({
+        label = "Fechar",
+        fontSize = 20,
+        shape = "roundedRect",
+        width = 120,
+        height = 50,
+        fillColor = { default = {1, 0, 0}, over = {0.8, 0, 0} },
+        labelColor = { default = {1}, over = {0.8} },
+        onRelease = function()
+            imageGroup:removeSelf()
+            imageGroup = nil
+        end
+    })
+    closeButton.x = display.contentCenterX
+    closeButton.y = display.contentHeight - 80
+    imageGroup:insert(closeButton)
 end
 
 -- Cena
@@ -93,14 +99,14 @@ function scene:create(event)
 
     -- Dados dos botões
     local buttonData = {
-        { label = "Domínio", color = {0.1, 0.6, 0.9}, image = "Images/ImgPag2/dominio.png" },
-        { label = "Reino", color = {1, 0.6, 0.2}, image = "Images/ImgPag2/reino.png" },
-        { label = "Filo", color = {0.3, 0.7, 0.3}, image = "Images/ImgPag2/filo.png" },
-        { label = "Classe", color = {0.1, 0.6, 0.9}, image = "Images/ImgPag2/classe.png" },
-        { label = "Ordem", color = {1, 0.6, 0.2}, image = "Images/ImgPag2/ordem.png" },
-        { label = "Família", color = {0.3, 0.7, 0.3}, image = "Images/ImgPag2/familia.png" },
-        { label = "Gênero", color = {0.1, 0.6, 0.9}, image = "Images/ImgPag2/genero.png" },
-        { label = "Espécie", color = {1, 0.6, 0.2}, image = "Images/ImgPag2/especie.png" },
+        { label = "Domínio", color = {0.1, 0.6, 0.9}, image = "" },
+        { label = "Reino", color = {1, 0.6, 0.2}, image = "" },
+        { label = "Filo", color = {0.3, 0.7, 0.3}, image = "" },
+        { label = "Classe", color = {0.1, 0.6, 0.9}, image = "" },
+        { label = "Ordem", color = {1, 0.6, 0.2}, image = "" },
+        { label = "Família", color = {0.3, 0.7, 0.3}, image = "" },
+        { label = "Gênero", color = {0.1, 0.6, 0.9}, image = "" },
+        { label = "Espécie", color = {1, 0.6, 0.2}, image = "" },
     }
 
     -- Criar botões dinamicamente
@@ -120,7 +126,7 @@ function scene:create(event)
             fillColor = { default = data.color, over = {0.8, 0.8, 0.8} },
             labelColor = { default = {0}, over = {1} },
             onRelease = function()
-                print("Tentando carregar a imagem: ", data.image)
+                print("Exibindo imagem: ", data.image)
                 showImage(sceneGroup, data.image)
             end
         })
