@@ -102,7 +102,7 @@ function scene:create(event)
     -- Explicação
     local explanation = display.newText({
         parent = sceneGroup,
-        text = "A classificação dos seres vivos em cinco reinos foi proposta em 1969 pelo biólogo norte-americano Robert Whittaker. Essa divisão é um tipo de organização que agrupa os seres vivos de acordo com semelhanças entre suas características estruturais, anatômicas e genéticas.\n\nToque no botão amarelo para empilhar as caixas com os nomes dos reinos biológicos.",
+        text = "A classificação dos seres vivos em cinco reinos foi proposta em 1969 pelo biólogo norte-americano Robert Whittaker. Essa divisão é um tipo de organização que agrupa os seres vivos de acordo com semelhanças entre suas características estruturais, anatômicas e genéticas.\n\nEmpilhE as caixas com os nomes dos reinos biológicos.",
         x = display.contentCenterX,
         y = 270,
         width = display.contentWidth - 40,
