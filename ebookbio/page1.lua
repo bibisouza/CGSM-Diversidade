@@ -3,41 +3,60 @@ local widget = require("widget")
 local scene = composer.newScene()
 
 -- Som
-local isSoundOn = true
+local isSoundPlaying = false
+local audioChannel
+local audioFile = audio.loadStream("Audios/a.mp3")
+local currentAudioPosition = 0
+
+local function playAudio()
+    audioChannel = audio.play(audioFile, { loops = -1, channel = 1, startTime = currentAudioPosition })
+    isSoundPlaying = true
+end
+
+local function pauseAudio()
+    if audioChannel then
+        currentAudioPosition = audio.getDuration(audioFile) * (audio.getVolume(audioChannel) / 1000 )
+        audio.stop(audioChannel)
+        isSoundPlaying = false
+    end
+end
 
 local function toggleSound()
-    isSoundOn = not isSoundOn
-    print("Som:", isSoundOn and "Ligado" or "Desligado")
+    if isSoundPlaying then
+        pauseAudio()
+    else
+        playAudio()
+    end
 end
 
--- Função para avançar para a próxima página
+-- Próxima página
 local function goToNextPage()
-    composer.gotoScene("page2") -- Crie a próxima página separadamente
+    composer.gotoScene("page2")
 end
 
--- Função para voltar à página anterior
+-- Página anterior
 local function goToPreviousPage()
-    composer.gotoScene("capa") -- Retorna à página anterior
+    composer.gotoScene("capa")
 end
 
--- Criação da cena
+-- Cena
 function scene:create(event)
     local sceneGroup = self.view
 
-    -- Fundo com cor sólida (verde escuro)
+    -- Fundo
     local background = display.newRect(sceneGroup, display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight)
-    background:setFillColor(0.05, 0.2, 0.05) -- Verde escuro
+    background:setFillColor(0.05, 0.2, 0.05)
 
-    -- Título principal
+    -- Título
     local title = display.newText({
         text = "Biodiversidade",
         x = display.contentCenterX,
         y = 100,
-        font = "Montserrat-VariableFont_wght.ttf-Bold", -- Fonte em negrito
+        font = "Montserrat-VariableFont_wght.ttf-Bold",
         fontSize = 64,
         align = "center"
     })
-    title:setFillColor(1) -- Branco
+    title:setFillColor(1)
     sceneGroup:insert(title)
 
     -- Texto explicativo
@@ -50,119 +69,32 @@ function scene:create(event)
         fontSize = 20,
         align = "justify"
     })
-    description:setFillColor(1) -- Branco
+    description:setFillColor(1) 
     sceneGroup:insert(description)
 
-    -- Espaços para imagens
-    local image1 = display.newImageRect(sceneGroup, "Images/ImgPag1/deserto.png", 240, 240)
-    image1.x = display.contentWidth * 0.2
-    image1.y = 560
-    image1.name = "Deserto"
-
-    local image2 = display.newImageRect(sceneGroup, "Images/ImgPag1/pradaria.png", 240, 240)
-    image2.x = display.contentWidth * 0.8
-    image2.y = 560
-    image2.name = "Pradaria"
-
-    local image3 = display.newImageRect(sceneGroup, "Images/ImgPag1/floresta.png", 240, 240)
-    image3.x = display.contentWidth * 0.5
-    image3.y = 820
-    image3.name = "Floresta"
-
-    -- Função validação
-    local function checkMatch(wordGroup, target)
-        local wordName = wordGroup.name or wordGroup[1].name
-        local targetName = target.name
-
-        if wordName == targetName then
-            target:setFillColor(0.2, 0.8, 0.2)
-            print(wordName .. " está correta!")
-        else
-            print(wordName .. " está incorreta!")
+    -- Função animação
+    local function animateBiome(biome)
+        if biome.name == "Pradaria" then
+            local grass = display.newImageRect(sceneGroup, "Images/ImgPag1/pradaria.png", 450, 450)
+            grass.x, grass.y = biome.x, biome.y
+            transition.to(grass, {xScale = 1.2, yScale = 1.2, time = 1000, iterations = 2, onComplete = function() grass:removeSelf() grass = nil end})
         end
     end
 
-    -- Interação
-    local function onDrag(event)
-        local target = event.target
-
-        if event.phase == "began" then
-            display.getCurrentStage():setFocus(target)
-            target.isFocus = true
-        
-            target.touchOffsetX = event.x - target.x
-            target.touchOffsetY = event.y - target.y
-
-            target[1]:setFillColor(1, 0.8, 0)
-
-
-        elseif event.phase == "moved" and target.isFocus then
-            target.x = event.x - target.touchOffsetX
-            target.y = event.y - target.touchOffsetY
-
-        elseif event.phase == "ended" or event.phase == "cancelled" then
-            if target.isFocus then
-                display.getCurrentStage():setFocus(nil)
-                target.isFocus = false
-
-
-                target[1]:setFillColor(1, 0.6, 0)
-
-
-                local matched = false
-                for _, ecosystem in ipairs({image1, image2, image3}) do
-                    local bounds = ecosystem.contentBounds
-                    if target.x > bounds.xMin and target.x < bounds.xMax and target.y > bounds.yMin and target.y < bounds.yMax then
-                        checkMatch(target, ecosystem)
-                        matched = true
-                        break
-                    end
-                end
-
-
-                if not matched then
-                    transition.to(target, {x = target.startX, y = target.startY, time = 300})
-                end
-            end
-        end
-        return true
+    -- Evento -> Imagens
+    local function addBiomeInteraction(biome)
+        biome:addEventListener("tap", function() animateBiome(biome) end)
     end
 
-    -- Caixas com texto
-    local function createWord(sceneGroup, x, y, text, name)
-        local group = display.newGroup()
-        sceneGroup:insert(group)
+    -- Interatividade
+    local image1 = display.newImageRect(sceneGroup, "Images/ImgPag1/pradaria.png", 450, 450)
+    image1.x = display.contentCenterX
+    image1.y = display.contentCenterY + 100
+    image1.name = "Pradaria"
+    sceneGroup:insert(image1)
 
-        local box = display.newRect(group, 0, 0, 150, 40)
-        box:setFillColor(1, 0.6, 0)
-        box.name = name
 
-        local boxText = display.newText({
-            parent = group,
-            text = text,
-            x = 0,
-            y = 0,
-            font = "Montserrat-VariableFont_wght",
-            fontSize = 18
-        })
-
-        group.x = x
-        group.y = y
-        group.startX = x
-        group.startY = y
-
-        -- Associar grupo
-        group.name = name
-
-        group:addEventListener("touch", onDrag)
-
-        return group
-    end
-
-    -- Palavras
-    local word1 = createWord(sceneGroup, display.contentWidth * 0.15, 380, "Pradaria", "Pradaria")
-    local word2 = createWord(sceneGroup, display.contentWidth * 0.5, 380, "Floresta", "Floresta")
-    local word3 = createWord(sceneGroup, display.contentWidth * 0.86, 380, "Deserto", "Deserto")
+    addBiomeInteraction(image1)
 
     -- Botão toggle de som
     local soundToggle = widget.newButton({
@@ -213,6 +145,20 @@ function scene:create(event)
     sceneGroup:insert(backButton)
 end
 
+function scene:show(event)
+    if event.phase == "did" then
+            playAudio()
+    end
+end
+
+function scene:hide(event)
+    if event.phase == "will" then
+        pauseAudio()
+    end
+end
+
 scene:addEventListener("create", scene)
+scene:addEventListener("show", scene)
+scene:addEventListener("hide", scene)
 
 return scene
