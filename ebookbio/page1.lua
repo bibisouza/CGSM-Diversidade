@@ -2,10 +2,9 @@ local composer = require("composer")
 local widget = require("widget")
 local scene = composer.newScene()
 
--- Variável global para estado do som
+-- Som
 local isSoundOn = true
 
--- Função para alternar o estado do som
 local function toggleSound()
     isSoundOn = not isSoundOn
     print("Som:", isSoundOn and "Ligado" or "Desligado")
