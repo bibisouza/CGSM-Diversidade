@@ -39,6 +39,37 @@ local function goToPreviousPage()
     composer.gotoScene("capa")
 end
 
+-- Animação
+local currentIndex = 1
+local images = {}
+local isAnimating = false
+
+
+local function animateImage(image)
+    if not isAnimating then
+        isAnimating = true
+        transition.to(image, { xScale = 1.5, yScale = 1.5, time = 500, onComplete = function()
+            timer.performWithDelay(1000, function()
+                transition.to(image, { xScale = 1, yScale = 1, time = 500, onComplete = function()
+                    isAnimating = false
+                end})
+            end)
+        end })
+    end
+end
+
+-- Evento /agitar
+local function onShake(event)
+    if event.isShake and not isAnimating then
+        animateImage(images[currentIndex])
+        
+        currentIndex = currentIndex + 1
+        if currentIndex > #images then
+            currentIndex = 1
+        end
+    end
+end
+
 -- Cena
 function scene:create(event)
     local sceneGroup = self.view
@@ -61,7 +92,7 @@ function scene:create(event)
 
     -- Texto explicativo
     local description = display.newText({
-        text = "A biodiversidade é o termo que se refere à variedade de seres vivos, ecossistemas e genes que existem no planeta. Sua conservação é essencial para manter o equilíbrio da vida no planeta.\n\nAbaixo tem-se três exemplos de ecossistemas. Arraste os nomes às suas respectivas imagens.",
+        text = "A biodiversidade é o termo que se refere à variedade de seres vivos, ecossistemas e genes que existem no planeta. Sua conservação é essencial para manter o equilíbrio da vida no planeta.\n\nAbaixo tem-se três exemplos de ecossistemas: as pradarias, as florestas e os desertos. Agite para ver melhor.",
         x = display.contentCenterX,
         y = 250,
         width = display.contentWidth * 0.9,
@@ -72,29 +103,36 @@ function scene:create(event)
     description:setFillColor(1) 
     sceneGroup:insert(description)
 
-    -- Função animação
-    local function animateBiome(biome)
-        if biome.name == "Pradaria" then
-            local grass = display.newImageRect(sceneGroup, "Images/ImgPag1/pradaria.png", 450, 450)
-            grass.x, grass.y = biome.x, biome.y
-            transition.to(grass, {xScale = 1.2, yScale = 1.2, time = 1000, iterations = 2, onComplete = function() grass:removeSelf() grass = nil end})
-        end
+    -- Imagem 1
+    local image1 = display.newImageRect(sceneGroup, "Images/ImgPag1/pradaria.png", 200, 200)
+    image1.x = display.contentCenterX - 250
+    image1.y = display.contentCenterY
+    images[#images + 1] = image1
+
+    -- Imagem 2
+    local image2 = display.newImageRect(sceneGroup, "Images/ImgPag1/floresta.png", 200, 200)
+    image2.x = display.contentCenterX
+    image2.y = display.contentCenterY
+    images[#images + 1] = image2
+
+    -- Imagem 3
+    local image3 = display.newImageRect(sceneGroup, "Images/ImgPag1/deserto.png", 200, 200)
+    image3.x = display.contentCenterX + 250
+    image3.y = display.contentCenterY
+    images[#images + 1] = image3
+
+-- Listener
+function scene:show(event)
+    if event.phase == "did" then
+        Runtime:addEventListener("accelerometer", onShake)
     end
+end
 
-    -- Evento -> Imagens
-    local function addBiomeInteraction(biome)
-        biome:addEventListener("tap", function() animateBiome(biome) end)
+function scene:hide(event)
+    if event.phase == "will" then
+        Runtime:removeEventListener("accelerometer", onShake)
     end
-
-    -- Interatividade
-    local image1 = display.newImageRect(sceneGroup, "Images/ImgPag1/pradaria.png", 450, 450)
-    image1.x = display.contentCenterX
-    image1.y = display.contentCenterY + 100
-    image1.name = "Pradaria"
-    sceneGroup:insert(image1)
-
-
-    addBiomeInteraction(image1)
+end
 
     -- Botão toggle de som
     local soundToggle = widget.newButton({
@@ -143,18 +181,6 @@ function scene:create(event)
     backButton.x = 90
     backButton.y = display.contentHeight - 120
     sceneGroup:insert(backButton)
-end
-
-function scene:show(event)
-    if event.phase == "did" then
-            playAudio()
-    end
-end
-
-function scene:hide(event)
-    if event.phase == "will" then
-        pauseAudio()
-    end
 end
 
 scene:addEventListener("create", scene)
