@@ -2,7 +2,6 @@ local composer = require("composer")
 local widget = require("widget")
 local scene = composer.newScene()
 
--- Som 
 -- Som
 local isSoundPlaying = false
 local audioChannel
