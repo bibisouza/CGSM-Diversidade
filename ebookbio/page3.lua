@@ -9,9 +9,9 @@ physics.setGravity(0, 9.8)
 
 -- Base
 local function createBase(sceneGroup)
-    local base = display.newRect(display.contentCenterX, display.contentHeight - 50, display.contentWidth, 10)
-    base:setFillColor(0.8, 0.8, 0.8)
-    physics.addBody(base, "static", { bounce = 0.1 })
+    local base = display.newRect(display.contentCenterX, display.contentHeight - 300, display.contentWidth, 10)
+    base:setFillColor(0.05, 0.2, 0.05)
+    physics.addBody(base, "static", { bounce = 0.0 })
     sceneGroup:insert(base)
 end
 
@@ -27,19 +27,23 @@ local function createFallingBoxes(sceneGroup)
     }
 
     local positions = {
-        display.contentCenterX - 200,
-        display.contentCenterX - 100,
+        display.contentCenterX - 280,
+        display.contentCenterX - 135,
         display.contentCenterX,
-        display.contentCenterX + 100,
-        display.contentCenterX + 200
+        display.contentCenterX + 159,
+        display.contentCenterX + 280
     }
 
     for i = 1, #boxData do
         timer.performWithDelay(500 * i, function()
-        local box = display.newRoundedRect(positions[i], -50, 120, 60, 12)
+        local box = display.newRoundedRect(positions[i], -50, 140, 70, 15)
         box:setFillColor(unpack(colors[i]))
         box.strokeWidth = 2
         box:setStrokeColor(0)
+        physics.addBody(box, "dynamic", { density = 0.5, friction = 0.1, bounce = 0 })
+        box.angularDamping = 0
+        box.isFixedRotation = true
+        box.gravityScale = 1
 
         local text = display.newText({
             text = boxData[i],
@@ -48,19 +52,18 @@ local function createFallingBoxes(sceneGroup)
             font = "Montserrat-VariableFont_wght.ttf-Bold",
             fontSize = 25,
         })
-        text:setFillColor(1)
+        text:setFillColor(0)
 
         local group = display.newGroup()
         group:insert(box)
         group:insert(text)
-
-        physics.addBody(box, "dynamic", { density = 0.8, friction = 0.3, bounce = 0.1})
-        box.angularDamping = 1.5
-
-        transition.to(box, { time = 1000, y = display.contentHeight - 100, rotation = 0, transition = easing.outBounce })
-
-        -- Add ao grupo da cena
         sceneGroup:insert(group)
+
+        local function updateTextPosition()
+            text.x, text.y = box.x, box.y
+        end
+        box.enterFrame = updateTextPosition
+        Runtime:addEventListener("enterFrame", box)
     end)
 end
 end
@@ -105,7 +108,7 @@ function scene:create(event)
     -- Explicação
     local explanation = display.newText({
         parent = sceneGroup,
-        text = "A classificação dos seres vivos em cinco reinos foi proposta em 1969 pelo biólogo norte-americano Robert Whittaker. Essa divisão é um tipo de organização que agrupa os seres vivos de acordo com semelhanças entre suas características estruturais, anatômicas e genéticas.\n\nEmpilhE as caixas com os nomes dos reinos biológicos.",
+        text = "A classificação dos seres vivos em cinco reinos foi proposta em 1969 pelo biólogo norte-americano Robert Whittaker. Essa divisão é um tipo de organização que agrupa os seres vivos de acordo com semelhanças entre suas características estruturais, anatômicas e genéticas.\n\n.",
         x = display.contentCenterX,
         y = 270,
         width = display.contentWidth - 40,

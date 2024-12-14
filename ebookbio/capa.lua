@@ -145,9 +145,6 @@ function scene:create(event)
 end
 
 function scene:show(event)
-    if event.phase == "did" then
-            playAudio()
-    end
 end
 
 function scene:hide(event)

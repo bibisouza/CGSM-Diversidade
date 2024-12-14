@@ -48,22 +48,6 @@ function scene:create(event)
     subtitle:setFillColor(1)
     sceneGroup:insert(subtitle)
 
-    -- Botão toggle de som
-    local soundToggle = widget.newButton({
-        label = "Som on/off",
-        font = "Montserrat-VariableFont_wght",
-        fontSize = 18,
-        shape = "roundedRect",
-        width = 150,
-        height = 40,
-        fillColor = { default = {0.1, 0.5, 0.9}, over = {0.8, 0.8, 0.8} },
-        labelColor = { default = {1}, over = {0} },
-        onRelease = toggleSound
-    })
-    soundToggle.x = display.contentWidth - 90
-    soundToggle.y = display.contentHeight - 60
-    sceneGroup:insert(soundToggle)
-
     -- Botão "?"
     local backButton = widget.newButton({
         label = "?",
