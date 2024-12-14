@@ -5,7 +5,7 @@ local scene = composer.newScene()
 -- Som
 local isSoundPlaying = false
 local audioChannel
-local audioFile = audio.loadStream("Audios/a.mp3")
+local audioFile = audio.loadStream("Audios/audpag1.mp3")
 local currentAudioPosition = 0
 
 local function playAudio()
@@ -181,6 +181,18 @@ end
     backButton.x = 90
     backButton.y = display.contentHeight - 120
     sceneGroup:insert(backButton)
+end
+
+function scene:show(event)
+    if event.phase == "did" then
+            playAudio()
+    end
+end
+
+function scene:hide(event)
+    if event.phase == "will" then
+        pauseAudio()
+    end
 end
 
 scene:addEventListener("create", scene)

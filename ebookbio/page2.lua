@@ -5,7 +5,6 @@ local scene = composer.newScene()
 -- Som 
 local isSoundOn = true
 
-
 local function toggleSound()
     isSoundOn = not isSoundOn
     print("Som:", isSoundOn and "Ligado" or "Desligado")
@@ -21,56 +20,17 @@ local function goToPreviousPage()
     composer.gotoScene("page1")
 end
 
--- Exibir imagem
-local function showImage(sceneGroup, imagePath)
-    local imageGroup = display.newGroup()
-    sceneGroup:insert(imageGroup)
-
-
-    local background = display.newRect(imageGroup, display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight)
-    background:setFillColor(0, 0, 0, 0.5)
-
-
-    background:addEventListener("tap", function()
-            display.remove(imageGroup)
-            imageGroup = nil
-    end)
-
-    -- Tentar carregar e exibir a imagem
-    local image = display.newImageRect(imageGroup, imagePath, system.ResourceDirectory, 600, 300) -- Ajuste o tamanho conforme necessário
-    if image then
-        image.x = display.contentCenterX
-        image.y = display.contentCenterY
-    else
-        print("Erro: Não foi possível carregar a imagem:", imagePath)
-    end
-
-    -- Botão "Fechar"
-    local closeButton = widget.newButton({
-        label = "Fechar",
-        fontSize = 20,
-        shape = "roundedRect",
-        width = 120,
-        height = 50,
-        fillColor = { default = {1, 0, 0}, over = {0.8, 0, 0} },
-        labelColor = { default = {1}, over = {0.8} },
-        onRelease = function()
-            imageGroup:removeSelf()
-            imageGroup = nil
-        end
-    })
-    closeButton.x = display.contentCenterX
-    closeButton.y = display.contentHeight - 80
-    imageGroup:insert(closeButton)
-end
-
 -- Cena
 function scene:create(event)
     local sceneGroup = self.view
 
     -- Fundo
     local background = display.newRect(sceneGroup, display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight)
-    background:setFillColor(0.05, 0.2, 0.05) 
+    background:setFillColor(0.05, 0.2, 0.05)
+
+    local treeBg = display.newImageRect(sceneGroup, "Images/ImgPag2/arvore.png", 360, 450)
+    treeBg.x = 360
+    treeBg.y = 700
 
     -- Título
     local title = display.newText({
@@ -97,41 +57,42 @@ function scene:create(event)
     })
     instruction:setFillColor(1)
 
-    -- Dados dos botões
-    local buttonData = {
-        { label = "Domínio", color = {0.1, 0.6, 0.9}, image = "Images/Imggg/dominio.png" },
-        { label = "Reino", color = {1, 0.6, 0.2}, image = "Images/Imggg/reino.png" },
-        { label = "Filo", color = {0.3, 0.7, 0.3}, image = "Images/Imggg/filo.png" },
-        { label = "Classe", color = {0.1, 0.6, 0.9}, image = "Images/Imggg/classe.png" },
-        { label = "Ordem", color = {1, 0.6, 0.2}, image = "Images/Imggg/ordem.png" },
-        { label = "Família", color = {0.3, 0.7, 0.3}, image = "Images/Imggg/familia.png" },
-        { label = "Gênero", color = {0.1, 0.6, 0.9}, image = "Images/Imggg/genero.png" },
-        { label = "Espécie", color = {1, 0.6, 0.2}, image = "Images/Imggg/especie.png" },
+    -- Toque para ampliar
+    local function zoomButton(button)
+        transition.to(button, {time = 200, xScale = 1.2, yScale = 1.2, onComplete = function()
+            transition.to(button, {time = 200, xScale = 1, yScale = 1})
+        end})
+    end
+
+    -- Dados das folhas
+    local leafData = {
+        { label = "Domínio", color = {0.1, 0.6, 0.9}, x = 360, y = 580 },
+        { label = "Reino", color = {1, 0.6, 0.2}, x = 180, y = 580},
+        { label = "Filo", color = {0.3, 0.7, 0.3}, x = 240, y = 685 },
+        { label = "Classe", color = {0.1, 0.6, 0.9}, x = 360, y = 775 },
+        { label = "Ordem", color = {1, 0.6, 0.2}, x = 480, y = 685 },
+        { label = "Família", color = {0.3, 0.7, 0.3}, x = 540, y = 580 },
+        { label = "Gênero", color = {0.1, 0.6, 0.9}, x = 485, y = 485 },
+        { label = "Espécie", color = {1, 0.6, 0.2}, x = 245, y = 485 },
     }
 
-    -- Criar botões dinamicamente
-    local startX = display.contentCenterX - 120
-    local startY = 500
-    local spacing = 80
-
-
-    for i, data in ipairs(buttonData) do
+    -- Criar caixas
+    for _, leaf in ipairs(leafData) do
         local button = widget.newButton({
-            label = data.label,
-            font = "Montserrat-VariableFont_wght.ttf-Bold",
-            fontSize = 25,
+            label = leaf.label,
+            font = "Montserrat-VariableFont_wght.ttf",
+            fontSize = 18,
             shape = "roundedRect",
-            width = 200,
+            width = 150,
             height = 50,
-            fillColor = { default = data.color, over = {0.8, 0.8, 0.8} },
-            labelColor = { default = {0}, over = {1} },
+            fillColor = { default = leaf.color, over = {0.3, 0.6, 1} },
+            labelColor = { default = {1}, over = {0} },
             onRelease = function()
-                print("Exibindo imagem: ", data.image)
-                showImage(sceneGroup, data.image)
+                zoomButton(button)
             end
         })
-        button.x = startX + ((i - 1) % 2) * 240
-        button.y = startY + math.floor((i - 1) / 2) * spacing
+        button.x = leaf.x
+        button.y = leaf.y
         sceneGroup:insert(button)
     end
 
@@ -183,6 +144,7 @@ function scene:create(event)
     backButton.x = 90
     backButton.y = display.contentHeight - 120
     sceneGroup:insert(backButton)
+
 end
 
 scene:addEventListener("create", scene)
