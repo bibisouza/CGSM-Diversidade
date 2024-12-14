@@ -1,78 +1,33 @@
 local composer = require("composer")
 local widget = require("widget")
-local physics = require("physics")
 local scene = composer.newScene()
 
--- Física
-physics.start()
-physics.setGravity(0, 9.8)
-
--- Base
-local function createBase(sceneGroup)
-    local base = display.newRect(display.contentCenterX, display.contentHeight - 300, display.contentWidth, 10)
-    base:setFillColor(0.05, 0.2, 0.05)
-    physics.addBody(base, "static", { bounce = 0.0 })
-    sceneGroup:insert(base)
-end
-
--- Caixas (criar e soltar)
-local function createFallingBoxes(sceneGroup)
-    local boxData = { "Animal", "Planta", "Fungo", "Protoctista", "Monera"}
-    local colors = {
-        {0.2, 0.6, 1},
-        {0.3, 0.8, 0.4},
-        {0.2, 0.6, 1},
-        {0.3, 0.8, 0.4},
-        {0.2, 0.6, 1},
-    }
-
-    local positions = {
-        display.contentCenterX - 280,
-        display.contentCenterX - 135,
-        display.contentCenterX,
-        display.contentCenterX + 159,
-        display.contentCenterX + 280
-    }
-
-    for i = 1, #boxData do
-        timer.performWithDelay(500 * i, function()
-        local box = display.newRoundedRect(positions[i], -50, 140, 70, 15)
-        box:setFillColor(unpack(colors[i]))
-        box.strokeWidth = 2
-        box:setStrokeColor(0)
-        physics.addBody(box, "dynamic", { density = 0.5, friction = 0.1, bounce = 0 })
-        box.angularDamping = 0
-        box.isFixedRotation = true
-        box.gravityScale = 1
-
-        local text = display.newText({
-            text = boxData[i],
-            x = box.x,
-            y = box.y,
-            font = "Montserrat-VariableFont_wght.ttf-Bold",
-            fontSize = 25,
-        })
-        text:setFillColor(0)
-
-        local group = display.newGroup()
-        group:insert(box)
-        group:insert(text)
-        sceneGroup:insert(group)
-
-        local function updateTextPosition()
-            text.x, text.y = box.x, box.y
-        end
-        box.enterFrame = updateTextPosition
-        Runtime:addEventListener("enterFrame", box)
-    end)
-end
-end
-
 -- Som 
-local isSoundOn = true
+-- Som
+local isSoundPlaying = false
+local audioChannel
+local audioFile = audio.loadStream("Audios/audpag3.mp3")
+local currentAudioPosition = 0
+
+local function playAudio()
+    audioChannel = audio.play(audioFile, { loops = -1, channel = 1, startTime = currentAudioPosition })
+    isSoundPlaying = true
+end
+
+local function pauseAudio()
+    if audioChannel then
+        currentAudioPosition = audio.getDuration(audioFile) * (audio.getVolume(audioChannel) / 1000 )
+        audio.stop(audioChannel)
+        isSoundPlaying = false
+    end
+end
+
 local function toggleSound()
-    isSoundOn = not isSoundOn
-    print("Som:", isSoundOn and "Ligado" or "Desligado")
+    if isSoundPlaying then
+        pauseAudio()
+    else
+        playAudio()
+    end
 end
 
 -- Próxima página
@@ -108,7 +63,7 @@ function scene:create(event)
     -- Explicação
     local explanation = display.newText({
         parent = sceneGroup,
-        text = "A classificação dos seres vivos em cinco reinos foi proposta em 1969 pelo biólogo norte-americano Robert Whittaker. Essa divisão é um tipo de organização que agrupa os seres vivos de acordo com semelhanças entre suas características estruturais, anatômicas e genéticas.\n\n.",
+        text = "A classificação dos seres vivos em cinco reinos foi proposta em 1969 pelo biólogo norte-americano Robert Whittaker. Essa divisão é um tipo de organização que agrupa os seres vivos de acordo com semelhanças entre suas características estruturais, anatômicas e genéticas.\n\nOs cinco reinos são: Animal, Planta, Fungo, Protoctista e Monera. Arraste a lupa para encontrá-los!",
         x = display.contentCenterX,
         y = 270,
         width = display.contentWidth - 40,
@@ -118,11 +73,52 @@ function scene:create(event)
     })
     explanation:setFillColor(1)
 
-    -- Base
-    createBase(sceneGroup)
+    -- Reinos escondidos
+    local kingdomData = {
+        { name = "Animal", x = display.contentCenterX - 250, y = 450 },
+        { name = "Planta", x = display.contentCenterX, y = 750 },
+        { name = "Fungo", x = display.contentCenterX + 280, y = 500 },
+        { name = "Protoctista", x = display.contentCenterX + 50, y = 920 },
+        { name = "Monera", x = display.contentCenterX - 280, y = 650 }
+    }
 
-    -- Caixas
-    createFallingBoxes(sceneGroup)
+    local hiddenGroup = display.newGroup()
+    sceneGroup:insert(hiddenGroup)
+
+    for _, kingdom in ipairs(kingdomData) do
+        local text = display.newText({
+            parent = hiddenGroup,
+            text = kingdom.name,
+            x = kingdom.x,
+            y = kingdom.y,
+            font = "Montserrat-VariableFont_wght.ttf",
+            fontSize = 28,
+            align = "center"
+        })
+        text:setFillColor(1, 1, 1)
+        text.isVisible = false
+    end
+
+    local lupa = display.newCircle(sceneGroup, display.contentCenterX, display.contentCenterY, 100)
+    lupa:setFillColor(1, 1, 1, 0.5)
+
+    local function revealHiddenItems(event)
+        for i = 1, hiddenGroup.numChildren do
+            local item = hiddenGroup[i]
+            if math.abs(item.x - event.x) < 100 and math.abs(item.y - event.y) < 100 then
+                item.isVisible = true
+            end
+        end
+        return true
+    end
+    
+    lupa:addEventListener("touch", function(event)
+        if event.phase == "moved" then
+            lupa.x, lupa.y = event.x, event.y
+            revealHiddenItems(event)
+        end
+    end)
+
 
  -- Botão som
  local soundToggle = widget.newButton({
@@ -171,6 +167,18 @@ local backButton = widget.newButton({
 backButton.x = 90
 backButton.y = display.contentHeight - 120
 sceneGroup:insert(backButton)
+end
+
+function scene:show(event)
+    if event.phase == "did" then
+            playAudio()
+    end
+end
+
+function scene:hide(event)
+    if event.phase == "will" then
+        pauseAudio()
+    end
 end
 
 scene:addEventListener("create", scene)
