@@ -47,7 +47,7 @@ function scene:create(event)
     -- Explicação
     local instruction = display.newText({
         parent = sceneGroup,
-        text = "A identificação e a classificação dos seres vivos exigem regras, normas e um método particular de trabalho. Desde Aristóteles até Lineu, vários sistemas de classificação foram propostos.\n\nToque em cada botão abaixo para visualizar exemplos.",
+        text = "A identificação e a classificação dos seres vivos exigem regras, normas e um método particular de trabalho. Desde Aristóteles até Lineu, vários sistemas de classificação foram propostos.\n\nToque em cada botão para ampliar.",
         x = display.contentCenterX,
         y = 300,
         width = display.contentWidth - 40,
@@ -59,41 +59,48 @@ function scene:create(event)
 
     -- Toque para ampliar
     local function zoomButton(button)
-        transition.to(button, {time = 200, xScale = 1.2, yScale = 1.2, onComplete = function()
-            transition.to(button, {time = 200, xScale = 1, yScale = 1})
+        transition.to(button, {time = 500, xScale = 1.2, yScale = 1.2, onComplete = function()
+            transition.to(button, {time = 500, xScale = 1, yScale = 1})
         end})
     end
 
     -- Dados das folhas
     local leafData = {
-        { label = "Domínio", color = {0.1, 0.6, 0.9}, x = 360, y = 580 },
-        { label = "Reino", color = {1, 0.6, 0.2}, x = 180, y = 580},
-        { label = "Filo", color = {0.3, 0.7, 0.3}, x = 240, y = 685 },
-        { label = "Classe", color = {0.1, 0.6, 0.9}, x = 360, y = 775 },
-        { label = "Ordem", color = {1, 0.6, 0.2}, x = 480, y = 685 },
+        { label = "Ordem", color = {0.1, 0.6, 0.9}, x = 360, y = 580 },
+        { label = "Classe", color = {1, 0.6, 0.2}, x = 180, y = 580},
+        { label = "Reino", color = {0.3, 0.7, 0.3}, x = 240, y = 685 },
+        { label = "Domínio", color = {0.1, 0.6, 0.9}, x = 360, y = 775 },
+        { label = "Filo", color = {1, 0.6, 0.2}, x = 480, y = 685 },
         { label = "Família", color = {0.3, 0.7, 0.3}, x = 540, y = 580 },
-        { label = "Gênero", color = {0.1, 0.6, 0.9}, x = 485, y = 485 },
-        { label = "Espécie", color = {1, 0.6, 0.2}, x = 245, y = 485 },
+        { label = "Espécie", color = {0.1, 0.6, 0.9}, x = 485, y = 485 },
+        { label = "Gênero", color = {1, 0.6, 0.2}, x = 245, y = 485 },
     }
 
     -- Criar caixas
     for _, leaf in ipairs(leafData) do
-        local button = widget.newButton({
-            label = leaf.label,
+        local buttonGroup = display.newGroup()
+        local buttonBackground = display.newRect(buttonGroup, 0, 0, 150, 50)
+        buttonBackground:setFillColor(unpack(leaf.color))
+        local buttonText = display.newText({
+            parent = buttonGroup,
+            text = leaf.label,
             font = "Montserrat-VariableFont_wght.ttf",
             fontSize = 18,
-            shape = "roundedRect",
-            width = 150,
-            height = 50,
-            fillColor = { default = leaf.color, over = {0.3, 0.6, 1} },
-            labelColor = { default = {1}, over = {0} },
-            onRelease = function()
-                zoomButton(button)
-            end
+            x = 0,
+            y = 0
         })
-        button.x = leaf.x
-        button.y = leaf.y
-        sceneGroup:insert(button)
+        buttonText:setFillColor(1)
+
+        buttonGroup.x = leaf.x
+        buttonGroup.y = leaf.y
+
+        buttonGroup:addEventListener("tap", function()
+            transition.to(buttonGroup, { time = 500, xScale = 1.2, yScale = 1.2, onComplete = function()
+                transition.to(buttonGroup, { time = 500, xScale = 1.0, yScale = 1.0 })
+            end })
+        end)
+
+        sceneGroup:insert(buttonGroup)
     end
 
 
