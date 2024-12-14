@@ -7,8 +7,16 @@ local scene = composer.newScene()
 physics.start()
 physics.setGravity(0, 9.8)
 
+-- Base
+local function createBase(sceneGroup)
+    local base = display.newRect(display.contentCenterX, display.contentHeight - 50, display.contentWidth, 10)
+    base:setFillColor(0.8, 0.8, 0.8)
+    physics.addBody(base, "static", { bounce = 0.1 })
+    sceneGroup:insert(base)
+end
+
 -- Caixas (criar e soltar)
-local function createFallingBoxes()
+local function createFallingBoxes(sceneGroup)
     local boxData = { "Animal", "Planta", "Fungo", "Protoctista", "Monera"}
     local colors = {
         {0.2, 0.6, 1},
@@ -18,46 +26,41 @@ local function createFallingBoxes()
         {0.2, 0.6, 1},
     }
 
-    local startY = 100
-    local delay = 500
-
-    local ground = display.newRect(display.contentCenterX, display.contentHeight - 150, display.contentWidth, 10)
-    ground:setFillColor(0, 0, 0, 0)
-    physics.addBody(ground, "static", { bounce = 0.2 })
-    scene.view:insert(ground)
+    local positions = {
+        display.contentCenterX - 200,
+        display.contentCenterX - 100,
+        display.contentCenterX,
+        display.contentCenterX + 100,
+        display.contentCenterX + 200
+    }
 
     for i = 1, #boxData do
-        timer.performWithDelay(delay * i, function()
-        local box = display.newRoundedRect(display.contentCenterX, startY, 200, 70, 12)
+        timer.performWithDelay(500 * i, function()
+        local box = display.newRoundedRect(positions[i], -50, 120, 60, 12)
         box:setFillColor(unpack(colors[i]))
         box.strokeWidth = 2
         box:setStrokeColor(0)
 
-        local boxText = display.newText({
+        local text = display.newText({
             text = boxData[i],
             x = box.x,
             y = box.y,
             font = "Montserrat-VariableFont_wght.ttf-Bold",
             fontSize = 25,
         })
-        boxText:setFillColor(1)
+        text:setFillColor(1)
 
-        local boxGroup = display.newGroup()
-        boxGroup:insert(box)
-        boxGroup:insert(boxText)
+        local group = display.newGroup()
+        group:insert(box)
+        group:insert(text)
 
-        box.enterFrame = function()
-            boxText.x = box.x
-            boxText.y = box.y
-        end
-        Runtime:addEventListener("enterFrame", box)
-        
-        -- Ativar
-        physics.addBody(box, "dynamic", { density = 1, friction = 0.5, bounce = 0.2})
-        box.angularDamping = 3
+        physics.addBody(box, "dynamic", { density = 0.8, friction = 0.3, bounce = 0.1})
+        box.angularDamping = 1.5
+
+        transition.to(box, { time = 1000, y = display.contentHeight - 100, rotation = 0, transition = easing.outBounce })
 
         -- Add ao grupo da cena
-        scene.view:insert(boxGroup)
+        sceneGroup:insert(group)
     end)
 end
 end
@@ -112,6 +115,12 @@ function scene:create(event)
     })
     explanation:setFillColor(1)
 
+    -- Base
+    createBase(sceneGroup)
+
+    -- Caixas
+    createFallingBoxes(sceneGroup)
+
  -- Botão som
  local soundToggle = widget.newButton({
     label = "Som on/off",
@@ -159,9 +168,6 @@ local backButton = widget.newButton({
 backButton.x = 90
 backButton.y = display.contentHeight - 120
 sceneGroup:insert(backButton)
-
-background:addEventListener("tap", createFallingBoxes)
-
 end
 
 scene:addEventListener("create", scene)
