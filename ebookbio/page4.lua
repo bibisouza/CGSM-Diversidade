@@ -5,11 +5,31 @@ local scene = composer.newScene()
 local isDefaultImage = true
 local isTextVisible = false
 
--- Som 
-local isSoundOn = true
+-- Som
+local isSoundPlaying = false
+local audioChannel
+local audioFile = audio.loadStream("Audios/audpag4.mp3")
+local currentAudioPosition = 0
+
+local function playAudio()
+    audioChannel = audio.play(audioFile, { loops = -1, channel = 1, startTime = currentAudioPosition })
+    isSoundPlaying = true
+end
+
+local function pauseAudio()
+    if audioChannel then
+        currentAudioPosition = audio.getDuration(audioFile) * (audio.getVolume(audioChannel) / 1000 )
+        audio.stop(audioChannel)
+        isSoundPlaying = false
+    end
+end
+
 local function toggleSound()
-    isSoundOn = not isSoundOn
-    print("Som:", isSoundOn and "Ligado" or "Desligado")
+    if isSoundPlaying then
+        pauseAudio()
+    else
+        playAudio()
+    end
 end
 
 -- Próxima página
@@ -20,16 +40,6 @@ end
 -- Página anterior
 local function goToPreviousPage()
     composer.gotoScene("page3")
-end
-
--- Função imagem
-local function toggleDogImage(dogImage)
-    if isDefaultImage then
-        dogImage.fill = { type = "image", filename = "Images/ImgPag4/dogalt.png" }
-    else
-        dogImage.fill = { type = "image", filename = "Images/ImgPag4/dog.png" }
-    end
-    isDefaultImage = not isDefaultImage
 end
 
 -- Cena
@@ -55,7 +65,7 @@ function scene:create(event)
     -- Explicação
     local explanation = display.newText({
         parent = sceneGroup,
-        text = "As regras de nomenclatura garantem que os seres vivos sejam nomeados de forma universal. Exemplo: o nome científico do ser humano é *Homo sapiens*.\n\nToque na imagem para descobrir seu nome científico e como ele é formado.",
+        text = "As regras de nomenclatura garantem que os seres vivos sejam nomeados de forma universal. Exemplo: o nome científico do cachorro é Canis lupus familiaris.\n\nToque na imagem do cachorro abaixo.",
         x = display.contentCenterX,
         y = 270,
         width = display.contentWidth - 40,
@@ -72,8 +82,8 @@ function scene:create(event)
 
 
     -- Balão
-    local textBubble = display.newRoundedRect(sceneGroup, dogImage.x, dogImage.y - 400, 400, 120, 20)
-    textBubble:setFillColor(1, 1, 1, 0.8)
+    local textBubble = display.newRoundedRect(sceneGroup, dogImage.x - 200, dogImage.y - 135, 350, 115, 50)
+    textBubble:setFillColor(1, 1, 1, 0.5)
     textBubble.isVisible = false
 
     local scientificName = display.newText({
@@ -82,7 +92,7 @@ function scene:create(event)
         x = textBubble.x,
         y = textBubble.y,
         width = textBubble.width - 20,
-        font = "",
+        font = "Montserrat-VariableFont_wght.ttf",
         fontSize = 20,
         align = "center"
     })
@@ -91,19 +101,24 @@ function scene:create(event)
 
     -- Animação
     local function toggleDogImage()
-        if isDeafultImage then
+        if isDefaultImage then
             dogImage.fill = { type = "image", filename = "Images/ImgPag4/dogalt.png" }
+            textBubble.isVisible = true
+            scientificName.isVisible = true
         else
             dogImage.fill = { type = "image", filename = "Images/ImgPag4/dog.png" }
+            textBubble.isVisible = false
+            scientificName.isVisible = false
         end
 
-            transition.scaleTo(textBubble, { xScale = 1.1, yScale = 1.1, time = 300, transition = easing.outQuad })
-            transition.scaleTo(textBubble, { xScale = 1, yScale = 1, time = 300, delay = 300 })
+        isDefaultImage = not isDefaultImage
 
-            transition.fadeIn(scientificName, { time = 400 })
+        transition.to(dogImage, { yScale = 1.1, xScale = 1.1, time = 150, transition = easing.outQuad })
+        transition.to(dogImage, { yScale = 1, xScale = 1, time = 150, delay = 150 })
     end
 
-    
+
+    dogImage:addEventListener("tap", toggleDogImage)
 
     -- Botão som
  local soundToggle = widget.newButton({
@@ -152,7 +167,18 @@ local backButton = widget.newButton({
 backButton.x = 90
 backButton.y = display.contentHeight - 120
 sceneGroup:insert(backButton)
+end
 
+function scene:show(event)
+    if event.phase == "did" then
+            playAudio()
+    end
+end
+
+function scene:hide(event)
+    if event.phase == "will" then
+        pauseAudio()
+    end
 end
 
 scene:addEventListener("create", scene)
