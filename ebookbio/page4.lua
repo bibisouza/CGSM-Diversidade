@@ -2,6 +2,9 @@ local composer = require("composer")
 local widget = require("widget")
 local scene = composer.newScene()
 
+local isDefaultImage = true
+local isTextVisible = false
+
 -- Som 
 local isSoundOn = true
 local function toggleSound()
@@ -67,8 +70,40 @@ function scene:create(event)
     dogImage.x = display.contentCenterX + 50
     dogImage.y = display.contentCenterY + 150
 
-    -- Interação imagem
-    dogImage:addEventListener("tap", function() toggleDogImage(dogImage) end)
+
+    -- Balão
+    local textBubble = display.newRoundedRect(sceneGroup, dogImage.x, dogImage.y - 400, 400, 120, 20)
+    textBubble:setFillColor(1, 1, 1, 0.8)
+    textBubble.isVisible = false
+
+    local scientificName = display.newText({
+        parent = sceneGroup,
+        text = "Canis lupus familiaris\n(Família: Canidae)",
+        x = textBubble.x,
+        y = textBubble.y,
+        width = textBubble.width - 20,
+        font = "",
+        fontSize = 20,
+        align = "center"
+    })
+    scientificName:setFillColor(0)
+    scientificName.isVisible = false
+
+    -- Animação
+    local function toggleDogImage()
+        if isDeafultImage then
+            dogImage.fill = { type = "image", filename = "Images/ImgPag4/dogalt.png" }
+        else
+            dogImage.fill = { type = "image", filename = "Images/ImgPag4/dog.png" }
+        end
+
+            transition.scaleTo(textBubble, { xScale = 1.1, yScale = 1.1, time = 300, transition = easing.outQuad })
+            transition.scaleTo(textBubble, { xScale = 1, yScale = 1, time = 300, delay = 300 })
+
+            transition.fadeIn(scientificName, { time = 400 })
+    end
+
+    
 
     -- Botão som
  local soundToggle = widget.newButton({
