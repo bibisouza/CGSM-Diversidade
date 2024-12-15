@@ -3,10 +3,30 @@ local widget = require("widget")
 local scene = composer.newScene()
 
 -- Som
-local isSoundOn = true
+local isSoundPlaying = false
+local audioChannel
+local audioFile = audio.loadStream("Audios/audcontracapa.mp3")
+local currentAudioPosition = 0
+
+local function playAudio()
+    audioChannel = audio.play(audioFile, { loops = -1, channel = 1, startTime = currentAudioPosition })
+    isSoundPlaying = true
+end
+
+local function pauseAudio()
+    if audioChannel then
+        currentAudioPosition = audio.getDuration(audioFile) * (audio.getVolume(audioChannel) / 1000 )
+        audio.stop(audioChannel)
+        isSoundPlaying = false
+    end
+end
+
 local function toggleSound()
-    isSoundOn = not isSoundOn
-    print("Som:", isSoundOn and "Ligado" or "Desligado")
+    if isSoundPlaying then
+        pauseAudio()
+    else
+        playAudio()
+    end
 end
 
 -- Função para voltar pro início
@@ -19,11 +39,11 @@ local function goToPreviousPage()
     composer.gotoScene("page5")
 end
 
--- Criação da cena
+-- Cena
 function scene:create(event)
     local sceneGroup = self.view
 
-    -- Fundo Cor
+    -- Fundo
     local background = display.newRect(sceneGroup, display.contentCenterX, display.contentCenterY, display.contentWidth, display.contentHeight)
     background:setFillColor(0.07, 0.2, 0.07)
 
@@ -123,6 +143,18 @@ function scene:create(event)
     backButton.x = 90
     backButton.y = display.contentHeight - 120
     sceneGroup:insert(backButton)
+end
+
+function scene:show(event)
+    if event.phase == "did" then
+            playAudio()
+    end
+end
+
+function scene:hide(event)
+    if event.phase == "will" then
+        pauseAudio()
+    end
 end
 
 scene:addEventListener("create", scene)
