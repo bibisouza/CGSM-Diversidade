@@ -3,10 +3,30 @@ local widget = require("widget")
 local scene = composer.newScene()
 
 -- Som 
-local isSoundOn = true
+local isSoundPlaying = false
+local audioChannel
+local audioFile = audio.loadStream("Audios/audpag5.mp3")
+local currentAudioPosition = 0
+
+local function playAudio()
+    audioChannel = audio.play(audioFile, { loops = -1, channel = 1, startTime = currentAudioPosition })
+    isSoundPlaying = true
+end
+
+local function pauseAudio()
+    if audioChannel then
+        currentAudioPosition = audio.getDuration(audioFile) * (audio.getVolume(audioChannel) / 1000 )
+        audio.stop(audioChannel)
+        isSoundPlaying = false
+    end
+end
+
 local function toggleSound()
-    isSoundOn = not isSoundOn
-    print("Som:", isSoundOn and "Ligado" or "Desligado")
+    if isSoundPlaying then
+        pauseAudio()
+    else
+        playAudio()
+    end
 end
 
 -- Próxima página
@@ -63,12 +83,12 @@ end
 -- Função lanterna
 local function toggleFlashlight(sceneGroup)
     local flashlightOn = false
-    local flashlightText
+    local revealedImage
 
     -- Imagem lanterna /normal
     local flashlight = display.newImageRect(sceneGroup, "Images/ImgPag5/lanternadesl.png", 150, 150)
     flashlight.x = 650
-    flashlight.y = 300
+    flashlight.y = 423
 
     -- Clique na lanterna
     local function onFlashlightTapped()
@@ -77,22 +97,15 @@ local function toggleFlashlight(sceneGroup)
         if flashlightOn then
             flashlight.fill = { type = "image", filename = "Images/ImgPag5/lanterna.png" }
 
-            flashlightText = display.newText({
-                parent = sceneGroup,
-                text = "Os vírus não são considerados seres vivos porque não possuem células, que são a base de toda forma de vida, e não realizam funções vitais de forma independente, como metabolismo e reprodução.\nPara se replicar, dependem completamente de uma célula hospedeira, o que os coloca fora dos critérios para serem classificados como organismos vivos.",
-                x = display.contentCenterX,
-                y = 500,
-                width = display.contentWidth - 60,
-                font = "Montserrat-VariableFont_wght.ttf",
-                fontSize = 20,
-                align = "justify"
-            })
+            revealedImage = display.newImageRect(sceneGroup, "Images/ImgPag5/virus.png", 450, 450)
+            revealedImage.x = display.contentCenterX
+            revealedImage.y = 645
         else
             flashlight.fill = { type = "image", filename = "Images/ImgPag5/lanternadesl.png" }
 
-            if flashlightText then
-                flashlightText:removeSelf()
-                flashlightText = nil
+            if revealedImage then
+                revealedImage:removeSelf()
+                revealedImage = nil
             end
         end
     end
@@ -124,9 +137,9 @@ function scene:create(event)
     -- Explicação
     local explanation = display.newText({
         parent = sceneGroup,
-        text = "Os vírus não são classificados em nenhum reino.\n\nToque na lanterna para descobrir mais.",
+        text = "Os vírus não são considerados seres vivos porque não possuem células, que são a base de toda forma de vida, e não realizam funções vitais de forma independente, como metabolismo e reprodução.\nPara se replicar, dependem completamente de uma célula hospedeira, o que os coloca fora dos critérios para serem classificados como organismos vivos.\n\nToque na lanterna.",
         x = display.contentCenterX,
-        y = 250,
+        y = 320,
         width = display.contentWidth - 60,
         font = "Montserrat-VariableFont_wght.ttf",
         fontSize = 20,
@@ -201,6 +214,18 @@ function scene:create(event)
     referencesButton.y = display.contentHeight - 130
     sceneGroup:insert(referencesButton)
 
+end
+
+function scene:show(event)
+    if event.phase == "did" then
+            playAudio()
+    end
+end
+
+function scene:hide(event)
+    if event.phase == "will" then
+        pauseAudio()
+    end
 end
 
 scene:addEventListener("create", scene)
